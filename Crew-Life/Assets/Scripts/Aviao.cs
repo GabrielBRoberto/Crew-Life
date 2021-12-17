@@ -2,22 +2,51 @@ using UnityEngine;
 
 namespace gNox.Tipos
 {
-
-    [CreateAssetMenu(fileName = "Avião", menuName = "Tipos/Avião", order = 0)]
-    [System.Serializable]
-    public class Aviao : ScriptableObject
+    public class Aviao : MonoBehaviour
     {
         [Header("Numero Minimo de Passageiros Acordados")]
-        public int valoMinimoPassageiro;
-        [Header("Numero Maximo de Passageiros Acordados")]
-        public int valorMaximoPassageiro;
+        [SerializeField]
+        private int valorMinimoPassageiro;
+        public int ValorMinimoPassageiro
+        {
+            get { return valorMinimoPassageiro; }
+            set { valorMinimoPassageiro = value; }
+        }
+
+        [Header("Numero Maximo de Passageiros Acordados/No Avião")]
+        [SerializeField]
+        private int valorMaximoPassageiro;
+        public int ValorMaximoPassageiro
+        {
+            get { return valorMaximoPassageiro; }
+            set { valorMaximoPassageiro = value; }
+        }
+
         [Header("Numero Minimo de Tripulantes")]
-        public int valorMinimoTripulantes;
+        [SerializeField]
+        private int valorMinimoTripulantes;
+        public int ValorMinimoTripulantes
+        {
+            get { return valorMinimoTripulantes; }
+            set { valorMinimoTripulantes = value; }
+        }
+
         [Header("Numero Maximo de Tripulantes")]
-        public int valorMaximoTripulantes;
+        [SerializeField]
+        private int valorMaximoTripulantes;
+        public int ValorMaximoTripulantes
+        {
+            get { return valorMaximoTripulantes; }
+            set { valorMaximoTripulantes = value; }
+        }
+
         [Header("Estrurura do Avião")]
-        public GameObject estruturaAviao;
-        [Header("Assentos")]
-        public Assento[] assentos;
+        [SerializeField]
+        private GameObject estruturaAviao;
+        public GameObject EstruturaAviao
+        {
+            get { return estruturaAviao; }
+            set { estruturaAviao = value; }
+        }
     }
 }

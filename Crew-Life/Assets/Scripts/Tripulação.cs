@@ -1,24 +1,66 @@
+using UnityEngine.AI;
 using UnityEngine;
 
 namespace gNox.Tipos
 {
-
-    [CreateAssetMenu(fileName = "Tripulação", menuName = "Tipos/Tripulação", order = 2)]
-    [System.Serializable]
-    public class Tripulação : ScriptableObject
+    public class Tripulação : MonoBehaviour
     {
         [Header("Velocidade de Movimento")]
-        public int velocidadeMovimento;
-        [Header("Velocidade da Resolução de Problemas")]
-        public int velocidadeProblema;
-        [Header("Paciencia Maxima")]
-        public float Paciencia;
-        [Header("Objeto 3D")]
-        public GameObject objeto3D;
-        [Header("Card do Tripulante")]
-        public Sprite cardTripulante;
-        [Header("Esta Resolvendo Algo??")]
-        public bool estaResolvendoAlgo;
+        [SerializeField]
+        private int velocidadeMovimento;
+        public int VelocidadeMovimento
+        {
+            get { return velocidadeMovimento; }
+            set { velocidadeMovimento = value; }
+        }
 
+        [Header("Velocidade da Resolução de Problemas")]
+        [SerializeField]
+        private int velocidadeProblema;
+        public int VelocidadeProblema
+        {
+            get { return velocidadeProblema; }
+            set { velocidadeProblema = value; }
+        }
+
+        [Header("Paciencia Maxima")]
+        [SerializeField]
+        private float paciencia;
+        public float Paciencia
+        {
+            get { return paciencia; }
+            set { paciencia = value; }
+        }
+
+        [Header("Card do Tripulante")]
+        [SerializeField]
+        private Sprite cardTripulante;
+        public Sprite CardTripulante
+        {
+            get { return cardTripulante; }
+            set { cardTripulante = value; }
+        }
+
+        [Header("Esta Resolvendo Algo??")]
+        [SerializeField]
+        private bool estaResolvendoAlgo;
+        public bool EstaResolvendoAlgo
+        {
+            get { return estaResolvendoAlgo; }
+            set { estaResolvendoAlgo = value; }
+        }
+
+        [Header("Pode Resolver Algo??")]
+        [SerializeField]
+        private bool podeResolverAlgo;
+        public bool PodeResolverAlgo
+        {
+            get { return podeResolverAlgo; }
+            set { podeResolverAlgo = value; }
+        }
+        private void Update()
+        {
+            GetComponent<NavMeshAgent>().speed = velocidadeMovimento;
+        }
     }
 }
