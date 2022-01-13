@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine;
 using gNox.Tipos;
+using ColorDebug;
 
 public class GameManager : MonoBehaviour
 {
@@ -33,7 +34,20 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int moedaPaga;          //Definir nome.
 
+    [Header("Triggers + Timers")]
     public bool trigged = false;
+    [SerializeField]
+    private float timerObjetivo;
+    [SerializeField]
+    private float timerAtual;
+    [SerializeField]
+    private float timerInicial;
+
+    [Header("Randoms")]
+    [SerializeField]
+    private int liberaAdRandom;
+    [SerializeField]
+    private int liberaAdPorcentagem;
 
     #region Mudança de HUD
 
@@ -92,6 +106,16 @@ public class GameManager : MonoBehaviour
         backToGame();
 
         canvas.transform.Find("InGame").Find("NumeroPassageiros").Find("Panel").Find("PassageirosText").GetComponent<Text>().text = aviao.ValorMinimoPassageiro + " / " + aviao.ValorMaximoPassageiro;
+
+        timerAtual = timerInicial;
+
+        timerObjetivo = Random.Range(0, 100);
+
+        if (timerAtual < timerObjetivo)
+        {
+            timerAtual = timerObjetivo * 2;
+            timerInicial = timerAtual;
+        }
     }
 
     private void FixedUpdate()
@@ -143,12 +167,39 @@ public class GameManager : MonoBehaviour
             {
                 aviao.ValorMaximoTripulantes--;
             }
-
-            passageirosGameObject[i].transform.Find("Canvas").gameObject.SetActive(false);
         }
 
         canvas.transform.Find("InGame").Find("AreaMoedas").Find("MoedaBasica").Find("Text").GetComponent<Text>().text = moedaGratis.ToString();
         canvas.transform.Find("InGame").Find("AreaMoedas").Find("MoedaPaga").Find("Text").GetComponent<Text>().text = moedaPaga.ToString();
+
+        if (timerAtual < timerObjetivo)
+        {
+            liberaAdRandom = Random.Range(0, 100);
+        }
+        
+        if (liberaAdRandom > liberaAdPorcentagem)
+        {
+            canvas.transform.Find("InGame").Find("PopUpAds").gameObject.SetActive(true);
+
+            timerAtual = timerInicial;
+        }
+        else
+        {
+            canvas.transform.Find("InGame").Find("PopUpAds").gameObject.SetActive(false);
+
+            timerAtual -= Time.deltaTime;
+        }
+    }
+
+    public void AdsRewardsSort()
+    {
+        DebugX.Log(@"Sorteia a recompensa:b;");
+
+        timerInicial = Random.Range(timerObjetivo + 20, timerObjetivo * 2);
+
+        timerAtual = timerInicial;
+
+        liberaAdRandom = Random.Range(0, 100);
     }
 
     public GameObject FindClosestTripulante(GameObject passageiro)
@@ -196,30 +247,24 @@ public class GameManager : MonoBehaviour
     {
         trigged = true;
 
+        Debug.Log("1");
+
         GameObject tripulanteProximo = FindClosestTripulante(passageiro);
 
         if (!tripulanteProximo.GetComponent<Tripulação>().EstaResolvendoAlgo)
         {
             tripulanteProximo.GetComponent<NavMeshAgent>().SetDestination(passageiro.transform.position);
+
+            tripulanteProximo.GetComponent<Tripulação>().Passageiro = passageiro;
+
+            float distancia = Vector3.Distance(tripulanteProximo.transform.position, passageiro.transform.position);
+            DebugX.Log($"{tripulanteProximo.name}:yellow:b; esta ha uma distancia de ; {distancia}:red; do ; {passageiro.name}:yellow:b;");
+
+            yield return new WaitForSeconds(1f);
+
             tripulanteProximo.GetComponent<Tripulação>().EstaResolvendoAlgo = true;
 
             StartCoroutine(TimerCoroutine());
-
-
-            StartCoroutine(TripulanteChegouNoPassageiro(tripulanteProximo, passageiro));
-
-            yield return new WaitForSeconds(5);
-        }
-    }
-    IEnumerator TripulanteChegouNoPassageiro(GameObject tripulante, GameObject passageiro)
-    {
-        Debug.Log(tripulante.GetComponent<NavMeshAgent>().remainingDistance);
-
-        if (tripulante.GetComponent<NavMeshAgent>().remainingDistance <= 1f)
-        {
-            Debug.Log("Tripulante Chegou");
-
-            yield break;
         }
     }
 }

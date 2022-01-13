@@ -1,5 +1,6 @@
 using UnityEngine.AI;
 using UnityEngine;
+using ColorDebug;
 
 namespace gNox.Tipos
 {
@@ -50,17 +51,33 @@ namespace gNox.Tipos
             set { estaResolvendoAlgo = value; }
         }
 
-        [Header("Pode Resolver Algo??")]
-        [SerializeField]
-        private bool podeResolverAlgo;
-        public bool PodeResolverAlgo
+        [Header("GameObject do Passageiro")]
+        private GameObject passageiro;
+        public GameObject Passageiro
         {
-            get { return podeResolverAlgo; }
-            set { podeResolverAlgo = value; }
+            get { return passageiro; }
+            set { passageiro = value; }
         }
+
         private void Update()
         {
-            GetComponent<NavMeshAgent>().speed = velocidadeMovimento;
+            GetComponent<NavMeshAgent>().speed = VelocidadeMovimento;
+
+            if (EstaResolvendoAlgo)
+            {
+                if (Vector3.Distance(this.transform.position, this.GetComponent<NavMeshAgent>().destination) == 7.5f)
+                {
+                    DebugX.Log($"{this.name}:green:b; chegou no ; {Passageiro.name}:green:b;");
+
+                    //Comeca a resolucao do problema
+
+                }
+                else
+                {
+                    float distancia = Vector3.Distance(this.transform.position, this.GetComponent<NavMeshAgent>().destination);
+                    DebugX.Log($"{this.name}:yellow:b; esta ha uma distancia de ; {distancia}:red; do ; {Passageiro.name}:yellow:b;");
+                }
+            }
         }
     }
 }

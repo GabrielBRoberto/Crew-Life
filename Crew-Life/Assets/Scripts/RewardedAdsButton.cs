@@ -5,15 +5,27 @@ using UnityEngine;
 [RequireComponent(typeof(Button))]
 public class RewardedAdsButton : MonoBehaviour, IUnityAdsListener
 {
-    #if UNITY_IOS
-    private string gameId = "4495564";
-    public string myPlacementId = "Rewarded_iOS";
-    #elif UNITY_ANDROID
-    private string gameId = "4495565";
-    public string myPlacementId = "Rewarded_Android";
-    #endif
+    private string gameId;
+    private string myPlacementId;
 
     Button myButton;
+
+    [SerializeField]
+    bool onAndroid;
+
+    private void Awake()
+    {
+        if (onAndroid)
+        {
+            gameId = "4495565";
+            myPlacementId = "Rewarded_Android";
+        }
+        else
+        {
+            gameId = "4495564";
+            myPlacementId = "Rewarded_iOS";
+        }
+    }
 
     void Start()
     {
@@ -56,6 +68,7 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsListener
         {
             Time.timeScale = 1;
             //Reward the user for watching the ad to completion.
+            FindObjectOfType<GameManager>().AdsRewardsSort();
         }
         else if (showResult == ShowResult.Skipped)
         {
