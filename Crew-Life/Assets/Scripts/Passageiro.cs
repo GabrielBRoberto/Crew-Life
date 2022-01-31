@@ -1,3 +1,4 @@
+using UnityEngine.UI;
 using UnityEngine;
 
 namespace gNox.Tipos
@@ -85,6 +86,15 @@ namespace gNox.Tipos
             set { estaComProblema = value; }
         }
 
+        [Header("Slider da Paciencia")]
+        [SerializeField]
+        private Slider pacienciaSlider;
+        public Slider PacienciaSlider
+        {
+            get { return pacienciaSlider; }
+            set { pacienciaSlider = value; }
+        }
+
         private void Awake()
         {
             valorMinimoMoeda = Random.Range(1, 50);
@@ -96,6 +106,9 @@ namespace gNox.Tipos
 
             valorInicialTimer = impacienciaTimer;
 
+            PacienciaSlider.minValue = ImpacienciaValorMaximo;
+            PacienciaSlider.maxValue = ImpacienciaValorMinimo;
+            
             float estaAcordadoRandom;
             estaAcordadoRandom = Random.Range(0, 100);
 
@@ -114,7 +127,27 @@ namespace gNox.Tipos
         {
             if (estaAcordado)
             {
-                gameObject.GetComponent<MeshRenderer>().material.color = Color.blue;
+                if (ImpacienciaTimer > ImpacienciaValorMinimo)
+                {
+                    gameObject.GetComponent<MeshRenderer>().material.color = Color.blue;
+                }
+                else
+                {
+                    PacienciaSlider.value = ImpacienciaTimer;
+
+                    if (ImpacienciaTimer < ImpacienciaValorMinimo)
+                    {
+                        gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+                    }
+                    if (ImpacienciaTimer < (ImpacienciaValorMaximo * 1.60))
+                    {
+                        gameObject.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                    }
+                    if (ImpacienciaTimer < (ImpacienciaValorMaximo * 1.30))
+                    {
+                        gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+                    }
+                }
             }
             else
             {

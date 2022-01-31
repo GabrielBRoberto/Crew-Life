@@ -36,12 +36,19 @@ public class GameManager : MonoBehaviour
 
     [Header("Triggers + Timers")]
     public bool trigged = false;
+    bool adTrigged;
+    bool canTriggerAd;
+    bool velocidadeTriggerAdReward;
+    bool impacienciaTriggerAdReward;
+    bool resolucaoTriggerAdReward;
+    public bool isTimer;
     [SerializeField]
     private float timerObjetivo;
     [SerializeField]
     private float timerAtual;
     [SerializeField]
     private float timerInicial;
+    float timerRemoveAdEffect;
 
     [Header("Randoms")]
     [SerializeField]
@@ -116,12 +123,14 @@ public class GameManager : MonoBehaviour
             timerAtual = timerObjetivo * 2;
             timerInicial = timerAtual;
         }
-    }
 
+        canTriggerAd = true;
+    }
     private void FixedUpdate()
     {
         AtualizaBotaoResolverProblema();
         AtualizaHUDGeral();
+        RemoveAdsEffect();
     }
 
     void AtualizaBotaoResolverProblema()
@@ -187,21 +196,138 @@ public class GameManager : MonoBehaviour
         {
             canvas.transform.Find("InGame").Find("PopUpAds").gameObject.SetActive(false);
 
-            timerAtual -= Time.deltaTime;
+            if (canTriggerAd)
+            {
+                timerAtual -= Time.deltaTime;
+            }
         }
     }
+    void RemoveAdsEffect()
+    {
+        if (adTrigged)
+        {
+            timerRemoveAdEffect -= Time.deltaTime;
 
+            if (timerRemoveAdEffect <= 0)
+            {
+                if (velocidadeTriggerAdReward)
+                {
+                    for (int i = 0; i < tripulacaoGameObject.Length; i++)
+                    {
+                        tripulacaoGameObject[i].GetComponent<Tripulação>().VelocidadeMovimento /= 2;
+                    }
+                }
+                if (resolucaoTriggerAdReward)
+                {
+                    for (int i = 0; i < tripulacaoGameObject.Length; i++)
+                    {
+                        tripulacaoGameObject[i].GetComponent<Tripulação>().VelocidadeProblema /= 2;
+                    }
+                }
+                if (impacienciaTriggerAdReward)
+                {
+                    for (int i = 0; i < tripulacaoGameObject.Length; i++)
+                    {
+                        tripulacaoGameObject[i].GetComponent<Tripulação>().Paciencia /= 2;
+                    }
+                }
+
+                velocidadeTriggerAdReward = false;
+                resolucaoTriggerAdReward = false;
+                impacienciaTriggerAdReward = false;
+
+                adTrigged = false;
+                canTriggerAd = true;
+            }
+        }
+        else
+        {
+            timerRemoveAdEffect = 20;
+        }
+    }
     public void AdsRewardsSort()
     {
         DebugX.Log(@"Sorteia a recompensa:b;");
+
+        int boostTripulanteSpeed = 20;
+        int boostResolucaoSpeed = 40;
+        int boostImpaciencia = 60;
+        int giveBasicCoin = 80;
+
+        /// <summary>
+        /// 0 - 20 Duplica a velocidade dos tripulantes.
+        /// 21 - 40 Diminui a velocidade de resolver o problema.
+        /// 41 - 60 Aumenta a impaciencia do tripulante.
+        /// 61 - 80 Da uma quantidade de moeda baisca.
+        /// 81 - 100 Da uma quantidade de moeda paga.
+        /// </summary>
+
+        int valorRandom = Random.Range(0, 100);
+
+        if (valorRandom <= boostTripulanteSpeed)
+        {
+            DebugX.Log(@"Aumenta Velocidade Tripulação:green:b;");
+
+            for (int i = 0; i < tripulacaoGameObject.Length; i++)
+            {
+                tripulacaoGameObject[i].GetComponent<Tripulação>().VelocidadeMovimento *= 2;
+            }
+
+            adTrigged = true;
+            canTriggerAd = false;
+            velocidadeTriggerAdReward = true;
+        }
+        else
+        {
+            if (valorRandom <= boostResolucaoSpeed)
+            {
+                DebugX.Log(@"Aumenta Velocidade Resolução:green:b;");
+
+                for (int i = 0; i < tripulacaoGameObject.Length; i++)
+                {
+                    tripulacaoGameObject[i].GetComponent<Tripulação>().VelocidadeProblema *= 2;
+                }
+
+                adTrigged = true;
+                canTriggerAd = false;
+                resolucaoTriggerAdReward = true;
+            }
+            else
+            {
+                if (valorRandom <= boostImpaciencia)
+                {
+                    DebugX.Log(@"Aumenta Impaciencia Maxima da Tripulação:green:b;");
+
+                    for (int i = 0; i < tripulacaoGameObject.Length; i++)
+                    {
+                        tripulacaoGameObject[i].GetComponent<Tripulação>().Paciencia *= 2;
+                    }
+
+                    adTrigged = true;
+                    canTriggerAd = false;
+                    impacienciaTriggerAdReward = true;
+                }
+                else
+                {
+                    if (valorRandom <= giveBasicCoin)
+                    {
+                        DebugX.Log(@"Da moedas basica:green:b;");
+                    }
+                    else
+                    {
+                        DebugX.Log(@"Da moeda paga:green:b;");
+                    }
+                }
+            }
+        }
 
         timerInicial = Random.Range(timerObjetivo + 20, timerObjetivo * 2);
 
         timerAtual = timerInicial;
 
         liberaAdRandom = Random.Range(0, 100);
+        
     }
-
     public GameObject FindClosestTripulante(GameObject passageiro)
     {
         if (passageiro.GetComponent<Passageiro>().EstaComProblema)
@@ -232,7 +358,6 @@ public class GameManager : MonoBehaviour
             return null;
         }
     }
-
     IEnumerator TimerCoroutine()
     {
         Debug.Log("TimerCoroutine Trigged");
@@ -267,4 +392,11 @@ public class GameManager : MonoBehaviour
             StartCoroutine(TimerCoroutine());
         }
     }
+    /*
+    public IEnumerator ResolveProblemaTimer(Tripulação tripulacaoScript, Passageiro passageiroScript)
+    {
+        float timer = 100;
+
+
+    }*/
 }

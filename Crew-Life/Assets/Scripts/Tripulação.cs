@@ -70,13 +70,24 @@ namespace gNox.Tipos
                     DebugX.Log($"{this.name}:green:b; chegou no ; {Passageiro.name}:green:b;");
 
                     //Comeca a resolucao do problema
+                    if (FindObjectOfType<GameManager>().isTimer)
+                    {
+                        //FindObjectOfType<GameManager>().ResolveProblemaTimer(this.GetComponent<Tripulação>(), passageiro.GetComponent<Passageiro>());
+                    }
+                    else
+                    {
 
+                    }
                 }
                 else
                 {
                     float distancia = Vector3.Distance(this.transform.position, this.GetComponent<NavMeshAgent>().destination);
                     DebugX.Log($"{this.name}:yellow:b; esta ha uma distancia de ; {distancia}:red; do ; {Passageiro.name}:yellow:b;");
                 }
+            }
+            else
+            {
+                Passageiro = null;
             }
         }
     }
