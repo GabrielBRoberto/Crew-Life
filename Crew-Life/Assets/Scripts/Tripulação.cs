@@ -65,14 +65,26 @@ namespace gNox.Tipos
 
             if (EstaResolvendoAlgo)
             {
-                if (Vector3.Distance(this.transform.position, this.GetComponent<NavMeshAgent>().destination) == 7.5f)
+                if (Vector3.Distance(this.transform.position, this.GetComponent<NavMeshAgent>().destination) <= 7.58f)
                 {
                     DebugX.Log($"{this.name}:green:b; chegou no ; {Passageiro.name}:green:b;");
+
 
                     //Comeca a resolucao do problema
                     if (FindObjectOfType<GameManager>().isTimer)
                     {
-                        //FindObjectOfType<GameManager>().ResolveProblemaTimer(this.GetComponent<Tripulação>(), passageiro.GetComponent<Passageiro>());
+                        GameManager manager = FindObjectOfType<GameManager>();
+
+                        if (manager.timerResolveProblemaAtual > 0)
+                        {
+                            manager.timerResolveProblemaAtual -= Time.deltaTime;
+                        }
+                        else
+                        {
+                            
+                            //passageiro.GetComponent<Passageiro>().EstaComProblema = false;
+                        }
+                        
                     }
                     else
                     {

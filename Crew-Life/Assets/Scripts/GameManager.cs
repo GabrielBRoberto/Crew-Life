@@ -30,9 +30,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Moedas")]
     [SerializeField]
-    private int moedaGratis;        //Definir nome.
+    public int moedaGratis;        //Definir nome.
     [SerializeField]
-    private int moedaPaga;          //Definir nome.
+    public int moedaPaga;          //Definir nome.
 
     [Header("Triggers + Timers")]
     public bool trigged = false;
@@ -49,6 +49,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private float timerInicial;
     float timerRemoveAdEffect;
+    public float timerResolveProblemaAtual;
+    [SerializeField]
+    float timerResolveProblemaInicio;
 
     [Header("Randoms")]
     [SerializeField]
@@ -139,7 +142,11 @@ public class GameManager : MonoBehaviour
         {
             if (passageirosGameObject[i].GetComponent<Passageiro>().EstaAcordado)
             {
-                passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaTimer -= Time.deltaTime;
+                if (!passageirosGameObject[i].GetComponent<Passageiro>().SendoResolvido)
+                {
+                    passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaTimer -= Time.deltaTime;
+                }
+
                 if (passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaValorMinimo >= passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaTimer)
                 {
                     if (passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaTimer <= passageirosGameObject[i].GetComponent<Passageiro>().ImpacienciaValorMaximo)
@@ -372,12 +379,12 @@ public class GameManager : MonoBehaviour
     {
         trigged = true;
 
-        Debug.Log("1");
-
         GameObject tripulanteProximo = FindClosestTripulante(passageiro);
 
         if (!tripulanteProximo.GetComponent<Tripulação>().EstaResolvendoAlgo)
         {
+            passageiro.GetComponent<Passageiro>().SendoResolvido = true;
+
             tripulanteProximo.GetComponent<NavMeshAgent>().SetDestination(passageiro.transform.position);
 
             tripulanteProximo.GetComponent<Tripulação>().Passageiro = passageiro;
@@ -385,18 +392,15 @@ public class GameManager : MonoBehaviour
             float distancia = Vector3.Distance(tripulanteProximo.transform.position, passageiro.transform.position);
             DebugX.Log($"{tripulanteProximo.name}:yellow:b; esta ha uma distancia de ; {distancia}:red; do ; {passageiro.name}:yellow:b;");
 
-            yield return new WaitForSeconds(1f);
+            tripulanteProximo.GetComponent<Tripulação>().Passageiro = passageiro;
 
             tripulanteProximo.GetComponent<Tripulação>().EstaResolvendoAlgo = true;
 
+            timerResolveProblemaAtual = timerResolveProblemaInicio;
+
             StartCoroutine(TimerCoroutine());
+
+            yield return new WaitForSeconds(1);
         }
     }
-    /*
-    public IEnumerator ResolveProblemaTimer(Tripulação tripulacaoScript, Passageiro passageiroScript)
-    {
-        float timer = 100;
-
-
-    }*/
 }
